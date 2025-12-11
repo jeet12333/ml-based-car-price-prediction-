@@ -1,0 +1,19 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - python -m pip install --upgrade pip
+      - pip install -r requirements.txt
+  build:
+    commands:
+      - echo "Packaging application for Elastic Beanstalk..."
+      - zip -r app.zip . -x "*.git*" "venv/*" "myenv/*" "*.pyc" "__pycache__/*"
+artifacts:
+  files:
+    - app.zip
+  discard-paths: yes
+cache:
+  paths:
+    - '/root/.cache/pip'
