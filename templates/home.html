@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Prediction</title>
+
+    <!-- Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: "Poppins", sans-serif;
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            padding: 40px;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 6px 30px rgba(16, 24, 40, 0.08);
+            border: 1px solid rgba(16, 24, 40, 0.06);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 34px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .car-logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 120px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .input-box {
+            position: relative;
+        }
+
+        .input-box .material-icons-outlined {
+            position: absolute;
+            left: 15px;
+            top: 13px;
+            color: #0ea5e9;
+            font-size: 22px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        input {
+            padding: 12px 18px 12px 50px;
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 15px;
+            outline: none;
+            transition: 0.12s ease;
+        }
+
+        input:focus {
+            border-color: rgba(14,165,233,0.9);
+            box-shadow: 0 6px 18px rgba(14,165,233,0.08);
+        }
+
+        .hint {
+            font-size: 12px;
+            margin-top: 6px;
+            color: #475569;
+            opacity: 0.9;
+        }
+
+        button {
+            margin-top: 35px;
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #0ea5e9, #0284c7);
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(2,132,199,0.18);
+        }
+
+        button:hover {
+            box-shadow: 0 8px 30px rgba(2,132,199,0.22);
+            transform: translateY(-2px);
+        }
+
+        .price-box {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 22px;
+            padding: 14px;
+            border-radius: 8px;
+            background: #f0f9ff;
+            color: #075985;
+            box-shadow: 0 6px 20px rgba(2,132,199,0.06);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/741/741407.png" class="car-logo">
+
+        <h1>AI Car Price Prediction</h1>
+
+        <form action="{{ url_for('predict_datapoint') }}" method="post">
+
+            {% set examples = {
+                'doornumber': 'Example: 2 or 4',
+                'drivewheel': 'Example: 1 (fwd), 2 (rwd), 3 (4wd)',
+                'enginelocation': 'Example: 1 (front), 2 (rear)',
+                'wheelbase': 'Example: 86.6',
+                'carlength': 'Example: 141.1',
+                'carwidth': 'Example: 60.3',
+                'carheight': 'Example: 47.8',
+                'curbweight': 'Example: 1488',
+                'cylindernumber': 'Example: 2 or 4 or 6 or 8',
+                'enginesize': 'Example: 61',
+                'boreratio': 'Example: 2.54',
+                'stroke': 'Example: 2.07',
+                'compressionratio': 'Example: 7.0',
+                'horsepower': 'Example: 48',
+                'peakrpm': 'Example: 4150',
+                'citympg': 'Example: 13',
+                'highwaympg': 'Example: 16'
+            } %}
+
+            <div class="form-grid">
+
+                {% for field in [
+                    ('doornumber', 'Door Number'),
+                    ('drivewheel', 'Drive Wheel'),
+                    ('enginelocation', 'Engine Location'),
+                    ('wheelbase', 'Wheel Base'),
+                    ('carlength', 'Car Length'),
+                    ('carwidth', 'Car Width'),
+                    ('carheight', 'Car Height'),
+                    ('curbweight', 'Curb Weight'),
+                    ('cylindernumber', 'Cylinder Number'),
+                    ('enginesize', 'Engine Size'),
+                    ('boreratio', 'Bore Ratio'),
+                    ('stroke', 'Stroke'),
+                    ('compressionratio', 'Compression Ratio'),
+                    ('horsepower', 'Horsepower'),
+                    ('peakrpm', 'Peak RPM'),
+                    ('citympg', 'City MPG'),
+                    ('highwaympg', 'Highway MPG')
+                ] %}
+
+                <div class="input-box">
+                    <span class="material-icons-outlined">speed</span>
+
+                    <input 
+                        type="{{ 'text' if field[0] in ['drivewheel','enginelocation'] else 'number' }}"
+                        name="{{ field[0] }}"
+                        placeholder="{{ examples.get(field[0], 'Enter') }}"
+                        required
+                    >
+
+                    <div class="hint">{{ field[1] }}</div>
+                </div>
+
+                {% endfor %}
+            </div>
+
+            <button type="submit">Predict Price</button>
+
+        </form>
+
+        {% if results %}
+        <div class="price-box">
+            Predicted Price: <b>{{ results }}</b>
+        </div>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
